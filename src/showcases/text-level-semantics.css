@@ -1,0 +1,18 @@
+body { margin: 0; font-family: system-ui, sans-serif; color: #1e1b4b; background: #eef2ff; }
+.board { display: grid; grid-template-columns: repeat(auto-fill, minmax(15rem, 1fr)); gap: 14px; padding: 20px; }
+.card { margin: 0; background: #fff; border: 1px solid #c7d2fe; border-radius: 14px; padding: 16px 18px; line-height: 1.7; }
+.tag { display: block; margin-bottom: 6px; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.08em; color: #6366f1; }
+kbd { border: 1px solid #a5b4fc; border-bottom-width: 3px; border-radius: 6px; padding: 0 6px; background: #eef2ff; }
+code, samp { background: #f1f5f9; border-radius: 5px; padding: 0 4px; }
+samp { color: #047857; }
+var { color: #be185d; }
+mark { background: #fde047; padding: 0 3px; border-radius: 3px; }
+u.spelling { text-decoration: wavy underline #ef4444; }
+s { color: #94a3b8; }
+small { display: block; color: #64748b; }
+abbr { text-decoration: underline dotted; cursor: help; }
+q { color: #4338ca; }
+ruby { font-size: 1.4rem; }
+rt { font-size: 0.6rem; color: #6366f1; }
+.plain { background: #e0e7ff; border-radius: 4px; padding: 0 4px; }
+a { color: #4f46e5; }

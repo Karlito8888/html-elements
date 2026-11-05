@@ -1,0 +1,59 @@
+<div class="app">
+  <h1>Weather dashboard</h1>
+  <weather-card>
+    <template shadowrootmode="open">
+      <style>
+        .card { padding: 18px 22px; border-radius: 16px; color: #fff; background: linear-gradient(135deg, #0ea5e9, #6366f1); }
+        h2 { margin: 0; font-size: 1.5rem; }
+        ::slotted(p) { margin: 4px 0 0; opacity: 0.9; }
+      </style>
+      <div class="card">
+        <h2><slot name="city">Somewhere</slot></h2>
+        <slot></slot>
+      </div>
+    </template>
+    <span slot="city">Lyon</span>
+    <p>Sunny all week. This card is a custom element: its slots receive the city and this sentence.</p>
+  </weather-card>
+
+  <h2>Temperatures this week</h2>
+  <canvas id="chart" width="560" height="200">A bar chart of the temperatures from Monday to Friday.</canvas>
+
+  <ul id="days"></ul>
+  <template id="day-row">
+    <li><span class="day"></span><span class="temp"></span></li>
+  </template>
+
+  <noscript>
+    <p>Turn on JavaScript to see the chart and the list.</p>
+  </noscript>
+
+  <script>
+    const week = [["Mon", 14], ["Tue", 17], ["Wed", 19], ["Thu", 16], ["Fri", 21]];
+
+    // The template is copied once per day to build the list.
+    const row = document.getElementById("day-row");
+    for (const [day, temp] of week) {
+      const item = row.content.cloneNode(true);
+      item.querySelector(".day").textContent = day;
+      item.querySelector(".temp").textContent = `${temp} °C`;
+      document.getElementById("days").append(item);
+    }
+
+    // The canvas is drawn pixel by pixel by the script.
+    const canvas = document.getElementById("chart");
+    const ctx = canvas.getContext("2d");
+    const barWidth = canvas.width / week.length;
+    week.forEach(([day, temp], i) => {
+      const height = temp * 8;
+      const x = i * barWidth + 16;
+      ctx.fillStyle = `hsl(${220 - temp * 8} 80% 55%)`;
+      ctx.beginPath();
+      ctx.roundRect(x, canvas.height - height - 24, barWidth - 32, height, 10);
+      ctx.fill();
+      ctx.fillStyle = "#1e293b";
+      ctx.font = "14px system-ui";
+      ctx.fillText(day, x + 8, canvas.height - 6);
+    });
+  </script>
+</div>

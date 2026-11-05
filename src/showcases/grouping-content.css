@@ -1,0 +1,22 @@
+body { margin: 0; font-family: system-ui, sans-serif; color: #14532d; background: #f0fdf4; }
+main { padding: 20px; display: grid; gap: 16px; }
+search form { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; }
+search label { font-weight: 600; }
+search input { flex: 1; min-width: 12rem; font: inherit; padding: 8px 14px; border: 1px solid #86efac; border-radius: 999px; }
+.card { background: #fff; border: 1px solid #bbf7d0; border-radius: 16px; padding: 22px 26px; }
+h1 { margin: 0; font-size: 1.8rem; }
+.lead { font-size: 1.1rem; color: #166534; }
+menu { display: flex; gap: 8px; padding: 0; margin: 0; list-style: none; }
+menu button { font: inherit; padding: 6px 14px; border: 1px solid #86efac; border-radius: 8px; background: #f0fdf4; color: #14532d; cursor: pointer; }
+hr { border: 0; border-top: 2px dashed #bbf7d0; margin: 20px 0; }
+.columns { display: grid; grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr)); gap: 20px; }
+h2 { font-size: 1.15rem; margin: 10px 0 6px; }
+ul, ol { margin: 0; padding-left: 1.3rem; line-height: 1.8; }
+dl { display: grid; grid-template-columns: max-content 1fr; gap: 6px 16px; }
+dt { font-weight: 700; }
+dd { margin: 0; }
+figure { margin: 16px 0 0; padding: 16px; background: #f0fdf4; border-radius: 12px; }
+blockquote { margin: 0; font-size: 1.1rem; font-style: italic; border-left: 4px solid #22c55e; padding-left: 14px; }
+blockquote p { margin: 0; }
+pre { margin: 0; font-size: 0.95rem; color: #15803d; }
+figcaption { margin-top: 10px; font-size: 0.85rem; color: #4d7c0f; }

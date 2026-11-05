@@ -26,9 +26,9 @@ const baseline = e.baseline && {
 
 <article class="element" id={e.id} aria-labelledby={`${e.id}-title`}>
   <header>
-    <h2 id={`${e.id}-title`}>
+    <h3 id={`${e.id}-title`}>
       <a href={`#${e.id}`}>{e.names.map((n) => <code>&lt;{n}&gt;</code>)}</a>
-    </h2>
+    </h3>
     <div class="badges">
       {baseline && <span class:list={["badge", baseline.cls]}>{baseline.text}{baseline.since && <span class="since">since {month(baseline.since)}</span>}</span>}
       {section.kind === "obsolete" && <span class="badge bad">Obsolete</span>}
@@ -55,7 +55,7 @@ const baseline = e.baseline && {
     {
       standard && (
         <section class="card">
-          <h3>Content model</h3>
+          <h4>Content model</h4>
           <dl class="model">
             <dt>Categories</dt><dd set:html={e.categories} />
             <dt>Parents</dt><dd set:html={e.parents} />
@@ -68,7 +68,7 @@ const baseline = e.baseline && {
     {
       e.support && (
         <section class="card">
-          <h3>Browser support</h3>
+          <h4>Browser support</h4>
           <table class="support">
             <caption class="visually-hidden">First browser version supporting {label}</caption>
             <tbody>
@@ -87,7 +87,7 @@ const baseline = e.baseline && {
     {
       standard && (
         <section class="card wide">
-          <h3>Attributes</h3>
+          <h4>Attributes</h4>
           {e.attrsNote && <p>Attributes: <Fragment set:html={e.attrsNote} />.</p>}
           {!e.attrsNote && !e.attributes.length && <p class="muted">No element-specific attribute.</p>}
           {
@@ -119,11 +119,11 @@ const baseline = e.baseline && {
 
 <style>
   .element { padding: 3rem 0; border-bottom: 1px solid var(--border); scroll-margin-top: calc(var(--header-h) + 1rem); }
-  .element:target h2 a { color: var(--accent); }
+  .element:target h3 a { color: var(--accent); }
   header { display: flex; flex-wrap: wrap; align-items: center; gap: 0.6rem 1rem; }
-  h2 { margin: 0; font-size: clamp(1.6rem, 3vw, 2.1rem); font-weight: 800; letter-spacing: -0.02em; }
-  h2 a { color: inherit; text-decoration: none; display: inline-flex; gap: 0.5rem; flex-wrap: wrap; }
-  h2 code { font-family: var(--font-mono), monospace; background: none !important; border: 0 !important; padding: 0 !important; font-size: 1em !important; }
+  h3 { margin: 0; font-size: clamp(1.6rem, 3vw, 2.1rem); font-weight: 800; letter-spacing: -0.02em; }
+  h3 a { color: inherit; text-decoration: none; display: inline-flex; gap: 0.5rem; flex-wrap: wrap; }
+  h3 code { font-family: var(--font-mono), monospace; background: none !important; border: 0 !important; padding: 0 !important; font-size: 1em !important; }
   .badges { display: flex; flex-wrap: wrap; gap: 0.4rem; }
   .since { font-weight: 400; }
   .src {
@@ -141,7 +141,7 @@ const baseline = e.baseline && {
   .facts { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 22rem), 1fr)); gap: 1rem; margin-top: 1.25rem; }
   .card { border: 1px solid var(--border); border-radius: var(--radius); padding: 1rem 1.2rem; background: var(--surface); min-width: 0; }
   .wide { grid-column: 1 / -1; }
-  h3 { margin: 0 0 0.75rem; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); }
+  h4 { margin: 0 0 0.75rem; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); }
   .model { display: grid; grid-template-columns: max-content 1fr; gap: 0.4rem 1rem; margin: 0; font-size: 0.92rem; }
   .model dt { color: var(--muted); }
   .model dd { margin: 0; }

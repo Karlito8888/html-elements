@@ -6,9 +6,11 @@ interface Props {
   example: Example;
   id: string;
   label: string;
+  /** Section showcase: browser-window bar, "Show tags" mode, the section's elements as chips. */
+  showcase?: { title: string; tags: string[]; urls: Record<string, string> };
 }
 
-const { example, id, label } = Astro.props;
+const { example, id, label, showcase } = Astro.props;
 const LANGS = [
   { key: "html", shiki: "html", title: "HTML" },
   { key: "css", shiki: "css", title: "CSS" },
@@ -17,16 +19,44 @@ const LANGS = [
 const tabs = LANGS.filter((l) => example[l.key]);
 // Embedded as JSON for the client; escaping "<" keeps "</script>" inside the code from closing the tag.
 const source = JSON.stringify(example).replace(/</g, "\\u003c");
+const xray = showcase && JSON.stringify({ tags: showcase.tags, urls: showcase.urls }).replace(/</g, "\\u003c");
 ---
 
-<div class="example" data-example={id}>
+<div class:list={["example", { showcase }]} data-example={id} data-max-height={showcase ? 1100 : undefined}>
   <div class="preview">
-    <div class="bar">
-      <span class="dot" aria-hidden="true"></span>
-      <span>Live preview</span>
-      <span class="hint">Example from MDN</span>
-    </div>
+    {
+      showcase ? (
+        <div class="bar window">
+          <span class="lights" aria-hidden="true"><i></i><i></i><i></i></span>
+          <span class="tab">
+            <img data-tab-icon alt="" width="14" height="14" hidden />
+            <span data-tab-title data-fallback={showcase.title}>{showcase.title}</span>
+          </span>
+          <span class="hint">Written for this site</span>
+          <button type="button" class="button small xray" data-action="xray" aria-pressed="false">Show tags</button>
+        </div>
+      ) : (
+        <div class="bar">
+          <span class="dot" aria-hidden="true"></span>
+          <span>Live preview</span>
+          <span class="hint">Example from MDN</span>
+        </div>
+      )
+    }
     <div class="frame" data-frame data-label={label}></div>
+    {
+      showcase && (
+        <div class="chips">
+          <p>Every element of this section is in the page above. Point at one to find it, click it to read its details.</p>
+          <ul>
+            {showcase.tags.map((tag) => (
+              <li><a href={showcase.urls[tag]} data-tag={tag}><code>&lt;{tag}&gt;</code></a></li>
+            ))}
+          </ul>
+          <p class="offscreen-note" data-offscreen-note hidden>Tags with a dashed border are not drawn on the page: look for them in the code below.</p>
+        </div>
+      )
+    }
   </div>
   <div class="code">
     <div class="bar">
@@ -61,6 +91,7 @@ const source = JSON.stringify(example).replace(/</g, "\\u003c");
     }
   </div>
   <script type="application/json" data-source set:html={source} />
+  {xray && <script type="application/json" data-xray set:html={xray} />}
 </div>
 
 <script>
@@ -87,6 +118,32 @@ const source = JSON.stringify(example).replace(/</g, "\\u003c");
   .hint { margin-left: auto; font-weight: 400; }
   .preview { display: flex; flex-direction: column; background: var(--bg-soft); }
   .frame { flex: 1; padding: 0.75rem; display: flex; }
+
+  /* Showcase: full width, preview above the code, a browser-like window bar. */
+  .showcase { grid-template-columns: minmax(0, 1fr); }
+  .showcase .code { border-left: 0; border-top: 1px solid var(--border); }
+  .lights { display: inline-flex; gap: 0.35rem; }
+  .lights i { width: 0.7rem; height: 0.7rem; border-radius: 50%; background: #ff5f57; }
+  .lights i:nth-child(2) { background: #febc2e; }
+  .lights i:nth-child(3) { background: #28c840; }
+  .tab {
+    display: inline-flex; align-items: center; gap: 0.45rem; min-width: 0; max-width: 18rem;
+    padding: 0.3rem 0.8rem; border-radius: 9px 9px 0 0; margin-bottom: -0.45rem; align-self: flex-end;
+    background: var(--surface); border: 1px solid var(--border); border-bottom: 0; color: var(--fg); font-weight: 500;
+  }
+  .tab span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .tab :global(.flash) { outline: 3px solid #a855f7; outline-offset: 2px; border-radius: 4px; }
+  .xray { font-weight: 600; }
+  .chips { padding: 0 0.9rem 0.9rem; }
+  .chips p { margin: 0 0 0.5rem; font-size: 0.85rem; color: var(--muted); }
+  .chips ul { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 0.4rem; }
+  .chips a { text-decoration: none; }
+  .chips a:hover code, .chips a:focus-visible code { border-color: #a855f7; color: #a855f7; }
+  .chips :global(.offscreen) code { border-style: dashed; border-color: var(--muted); opacity: 0.8; }
+  .chips .offscreen-note { margin: 0.5rem 0 0; font-size: 0.8rem; font-style: italic; }
+  @media (max-width: 40rem) {
+    .hint, .lights { display: none; }
+  }
   .frame :global(iframe) {
     width: 100%; height: 220px; border: 0; border-radius: 10px; background: #fff;
     box-shadow: 0 0 0 1px var(--border);

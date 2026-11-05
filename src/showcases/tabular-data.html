@@ -1,0 +1,53 @@
+<div class="wrap">
+  <table>
+    <caption>Our trip budget, in euros</caption>
+    <colgroup>
+      <col>
+      <col span="2">
+      <col class="total-col">
+    </colgroup>
+    <thead>
+      <tr>
+        <th scope="col">Expense</th>
+        <th scope="col">Planned</th>
+        <th scope="col">Spent</th>
+        <th scope="col">Left</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <th scope="row">Train tickets</th>
+        <td>120</td>
+        <td>110</td>
+        <td>10</td>
+      </tr>
+      <tr>
+        <th scope="row">Hotel</th>
+        <td>300</td>
+        <td>280</td>
+        <td>20</td>
+      </tr>
+      <tr>
+        <th scope="row">Food</th>
+        <td>150</td>
+        <td>170</td>
+        <td class="over">-20</td>
+      </tr>
+      <tr>
+        <th scope="row">Museums</th>
+        <td>60</td>
+        <td>45</td>
+        <td>15</td>
+      </tr>
+    </tbody>
+    <tfoot>
+      <tr>
+        <th scope="row">Total</th>
+        <td>630</td>
+        <td>605</td>
+        <td>25</td>
+      </tr>
+    </tfoot>
+  </table>
+  <p class="note">The last column is colored through its <code>&lt;col&gt;</code>: one element styles a whole column.</p>
+</div>

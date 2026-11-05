@@ -1,0 +1,25 @@
+<div class="faq">
+  <h1>Frequently asked questions</h1>
+  <p class="lead">Click a question: it opens without any JavaScript. Opening one closes the others, because they share the same name.</p>
+
+  <details name="faq" open>
+    <summary>Do I need to install anything?</summary>
+    <p>No. A text editor and a browser are enough to write your first page.</p>
+  </details>
+  <details name="faq">
+    <summary>How long does it take to learn HTML?</summary>
+    <p>A few days for the basics, then you keep learning by building pages.</p>
+  </details>
+  <details name="faq">
+    <summary>Is HTML a programming language?</summary>
+    <p>It is a markup language: it describes what each part of the page is.</p>
+  </details>
+
+  <button type="button" class="open" command="show-modal" commandfor="contact">Still a question? Contact us</button>
+
+  <dialog id="contact">
+    <h2>Contact us</h2>
+    <p>This is a dialog box. The rest of the page is blocked until you close it.</p>
+    <button type="button" command="close" commandfor="contact">Close</button>
+  </dialog>
+</div>

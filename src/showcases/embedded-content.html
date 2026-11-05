@@ -1,0 +1,71 @@
+<div class="gallery">
+  <figure>
+    <picture>
+      <source srcset="https://developer.mozilla.org/shared-assets/images/examples/surfer.jpg" media="(max-width: 600px)">
+      <img src="https://developer.mozilla.org/shared-assets/images/examples/painted-hand.jpg" alt="An open hand covered in blue and red paint" width="298" height="332">
+    </picture>
+    <figcaption><b>picture, source, img</b>: a painted hand on wide screens, a surfer on narrow ones. Make the window narrow to swap.</figcaption>
+  </figure>
+
+  <figure>
+    <video controls crossorigin="anonymous" width="320" src="https://developer.mozilla.org/shared-assets/videos/friday.mp4">
+      <track default kind="captions" srclang="en" label="English" src="https://developer.mozilla.org/shared-assets/misc/friday.vtt">
+    </video>
+    <figcaption><b>video, track</b>: press play, the captions come from the track.</figcaption>
+  </figure>
+
+  <figure>
+    <audio controls src="https://developer.mozilla.org/shared-assets/audio/t-rex-roar.mp3"></audio>
+    <figcaption><b>audio</b>: a dinosaur roar.</figcaption>
+  </figure>
+
+  <figure>
+    <iframe title="A small page inside this page" srcdoc="<p style='font:16px system-ui;margin:16px'>I am a whole web page, framed inside another one.</p>"></iframe>
+    <figcaption><b>iframe</b>: a page inside the page.</figcaption>
+  </figure>
+
+  <figure>
+    <embed type="image/jpeg" src="https://developer.mozilla.org/shared-assets/images/examples/flowers.jpg" width="250" height="200">
+    <figcaption><b>embed</b>: an external resource, here purple flowers.</figcaption>
+  </figure>
+
+  <figure>
+    <object type="video/mp4" data="https://developer.mozilla.org/shared-assets/videos/flower.mp4" width="250" height="200"></object>
+    <figcaption><b>object</b>: another way to embed a resource, here a video.</figcaption>
+  </figure>
+
+  <figure>
+    <map name="infographic">
+      <area shape="poly" coords="130,147,200,107,254,219,130,228" href="https://developer.mozilla.org/docs/Web/HTML" alt="HTML">
+      <area shape="poly" coords="130,147,130,228,6,219,59,107" href="https://developer.mozilla.org/docs/Web/CSS" alt="CSS">
+      <area shape="poly" coords="130,147,200,107,130,4,59,107" href="https://developer.mozilla.org/docs/Web/JavaScript" alt="JavaScript">
+    </map>
+    <img usemap="#infographic" src="https://developer.mozilla.org/shared-assets/images/examples/mdn-info2.png" alt="MDN infographic">
+    <figcaption><b>map, area</b>: each colored part of the image is a different link.</figcaption>
+  </figure>
+
+  <figure>
+    <svg viewBox="0 0 120 120" width="120" height="120" role="img" aria-label="A smiling sun">
+      <circle cx="60" cy="60" r="34" fill="#facc15"></circle>
+      <circle cx="48" cy="54" r="4" fill="#78350f"></circle>
+      <circle cx="72" cy="54" r="4" fill="#78350f"></circle>
+      <path d="M46 70 Q60 82 74 70" stroke="#78350f" stroke-width="4" fill="none" stroke-linecap="round"></path>
+    </svg>
+    <figcaption><b>svg</b>: a drawing made of shapes, sharp at any size.</figcaption>
+  </figure>
+
+  <figure>
+    <p class="formula">
+      <math display="block">
+        <mrow>
+          <mi>x</mi><mo>=</mo>
+          <mfrac>
+            <mrow><mo>−</mo><mi>b</mi><mo>±</mo><msqrt><mrow><msup><mi>b</mi><mn>2</mn></msup><mo>−</mo><mn>4</mn><mi>a</mi><mi>c</mi></mrow></msqrt></mrow>
+            <mrow><mn>2</mn><mi>a</mi></mrow>
+          </mfrac>
+        </mrow>
+      </math>
+    </p>
+    <figcaption><b>math</b>: a math formula written with MathML.</figcaption>
+  </figure>
+</div>

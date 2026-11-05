@@ -1,8 +1,10 @@
 ---
 import ElementBlock from "../components/ElementBlock.astro";
+import Example from "../components/Example.astro";
 import SectionNav from "../components/SectionNav.astro";
 import Base from "../layouts/Base.astro";
-import { data, type Section } from "../data";
+import { data, sectionUrl, type Section } from "../data";
+import { showcaseFor } from "../showcases";
 
 export function getStaticPaths() {
   return data.sections.map((section) => ({ params: { section: section.slug }, props: { section } }));
@@ -15,6 +17,9 @@ interface Props {
 const { section } = Astro.props;
 const names = section.elements.flatMap((e) => e.names);
 const description = `${section.title}: ${names.map((n) => `<${n}>`).join(", ")}. Descriptions, attributes, browser support and live examples, from the WHATWG HTML standard and MDN.`;
+const showcase = showcaseFor(section);
+// Every element of the site, so "Show tags" can open any element, not only this section's.
+const urls = Object.fromEntries(data.sections.flatMap((s) => s.elements.flatMap((e) => e.names.map((n) => [n, `${sectionUrl(s)}#${e.id}`]))));
 ---
 
 <Base title={section.title} description={description}>
@@ -50,6 +55,19 @@ const description = `${section.title}: ${names.map((n) => `<${n}>`).join(", ")}.
         }
         {section.spec && <a class="spec" href={section.spec}>Read this section of the standard ↗</a>}
       </header>
+      {
+        showcase && (
+          <section class="together" aria-labelledby="together-title">
+            <h2 id="together-title">{names.length > 1 ? `All ${names.length} elements together` : "See it in action"}</h2>
+            <p>
+              One small page that uses every element of this section. Turn on <strong>Show tags</strong> and point at any part of
+              the page: a label tells you which element draws it. Click to jump to that element's details below.
+            </p>
+            <Example example={showcase} id="showcase" label={`all the elements of ${section.title}`} showcase={{ title: section.title, tags: names, urls }} />
+          </section>
+        )
+      }
+      <h2 class="detail">{section.elements.length > 1 ? "Each element in detail" : "The element in detail"}</h2>
       {section.elements.map((element) => <ElementBlock element={element} section={section} />)}
     </div>
   </div>
@@ -65,4 +83,8 @@ const description = `${section.title}: ${names.map((n) => `<${n}>`).join(", ")}.
   h1 { margin: 0.2rem 0 0.75rem; font-size: clamp(2.2rem, 5vw, 3.4rem); font-weight: 800; letter-spacing: -0.03em; line-height: 1.1; }
   .intro p { color: var(--muted); max-width: 70ch; font-size: 1.05rem; }
   .spec { font-weight: 600; }
+  .together { padding-top: 2rem; }
+  h2 { margin: 0; font-size: clamp(1.5rem, 3vw, 1.9rem); font-weight: 800; letter-spacing: -0.02em; }
+  .together p { color: var(--muted); max-width: 70ch; margin: 0.5rem 0 0; }
+  .detail { padding-top: 3rem; padding-bottom: 0.5rem; border-bottom: 1px solid var(--border); }
 </style>

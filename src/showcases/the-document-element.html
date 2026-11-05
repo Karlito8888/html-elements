@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>My first web page</title>
+    <style>
+      html {
+        min-height: 100%;
+        background: linear-gradient(135deg, #fff7ed, #f5f3ff);
+        font-family: system-ui, sans-serif;
+        color: #1f2937;
+      }
+      body { margin: 0; padding: 56px 24px; text-align: center; }
+      h1 { margin: 0 0 12px; font-size: 2.4rem; letter-spacing: -0.02em; }
+      p { max-width: 34rem; margin: 10px auto; line-height: 1.6; color: #4b5563; }
+      code { background: #fff; border: 1px solid #e5e7eb; border-radius: 6px; padding: 0 0.3em; }
+      .tree {
+        display: inline-block; margin-top: 24px; padding: 16px 24px; text-align: left;
+        background: #fff; border: 1px solid #e5e7eb; border-radius: 12px; line-height: 1.8;
+        font-family: ui-monospace, monospace; font-size: 0.9rem;
+      }
+      .tree span { color: #c2410c; font-weight: 600; }
+    </style>
+  </head>
+  <body>
+    <h1>Hello, web!</h1>
+    <p>Everything on this page lives inside one <code>&lt;html&gt;</code> element. It is the root: every other element is inside it.</p>
+    <p>Its <code>lang="en"</code> attribute says which language the page is written in.</p>
+    <p class="tree">
+      <span>&lt;html&gt;</span><br>
+      &nbsp;&nbsp;&lt;head&gt; information about the page &lt;/head&gt;<br>
+      &nbsp;&nbsp;&lt;body&gt; what you see &lt;/body&gt;<br>
+      <span>&lt;/html&gt;</span>
+    </p>
+  </body>
+</html>

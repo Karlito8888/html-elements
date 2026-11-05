@@ -1,0 +1,55 @@
+<form id="signup" class="signup">
+  <h1>Join the HTML workshop</h1>
+
+  <fieldset>
+    <legend>About you</legend>
+    <label for="name">Name</label>
+    <input id="name" name="name" required placeholder="Ada Lovelace" autocomplete="name">
+
+    <label for="email">Email</label>
+    <input id="email" name="email" type="email" required placeholder="ada@example.com" autocomplete="email">
+
+    <label for="city">City</label>
+    <input id="city" name="city" list="cities" placeholder="Start typing...">
+    <datalist id="cities">
+      <option value="Paris"></option>
+      <option value="Lyon"></option>
+      <option value="Montreal"></option>
+      <option value="Brussels"></option>
+    </datalist>
+  </fieldset>
+
+  <fieldset>
+    <legend>Your workshop</legend>
+    <label for="topic">Topic</label>
+    <select id="topic" name="topic" required>
+      <button type="button"><selectedcontent></selectedcontent></button>
+      <option value="">Choose a topic</option>
+      <optgroup label="Beginners">
+        <option value="html">🌱 HTML basics</option>
+        <option value="css">🎨 CSS first steps</option>
+      </optgroup>
+      <optgroup label="Going further">
+        <option value="forms">📝 Forms in depth</option>
+        <option value="a11y">♿ Accessibility</option>
+      </optgroup>
+    </select>
+
+    <label for="seats">Seats</label>
+    <input id="seats" name="seats" type="range" min="1" max="5" value="1">
+    <p class="total"><output id="seats-out" for="seats">1</output> seat, total <output id="total" for="seats">20</output> euros</p>
+
+    <label for="notes">Anything to add?</label>
+    <textarea id="notes" name="notes" rows="3" placeholder="Allergies, questions..."></textarea>
+  </fieldset>
+
+  <div class="gauges">
+    <label for="filled">Form completed</label>
+    <progress id="filled" max="3" value="0">0 of 3</progress>
+    <label for="places">Places already taken</label>
+    <meter id="places" min="0" max="30" low="15" high="25" optimum="0" value="24">24 of 30</meter>
+  </div>
+
+  <button type="submit">Sign me up</button>
+  <p class="thanks" id="thanks" hidden>Thanks! This is a demo, nothing was sent.</p>
+</form>

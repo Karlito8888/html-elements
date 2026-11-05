@@ -1,0 +1,14 @@
+body { margin: 0; font-family: system-ui, sans-serif; color: #1e293b; background: #f8fafc; }
+.wrap { padding: 24px; overflow-x: auto; }
+table { width: 100%; max-width: 40rem; margin: 0 auto; border-collapse: separate; border-spacing: 0; background: #fff; border: 1px solid #cbd5e1; border-radius: 14px; overflow: hidden; }
+caption { caption-side: top; padding: 0 0 12px; font-size: 1.3rem; font-weight: 700; text-align: left; }
+.total-col { background: #fef3c7; }
+th, td { padding: 10px 16px; text-align: right; border-bottom: 1px solid #e2e8f0; }
+th[scope="row"], thead th:first-child { text-align: left; }
+thead th { background: #1e293b; color: #fff; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.05em; }
+tbody tr:nth-child(even) { background: #f1f5f9; }
+tbody tr:hover { background: #e0f2fe; }
+tfoot th, tfoot td { font-weight: 700; border-bottom: 0; border-top: 2px solid #1e293b; }
+.over { color: #dc2626; font-weight: 700; }
+.note { max-width: 40rem; margin: 12px auto 0; color: #64748b; font-size: 0.9rem; }
+code { background: #e2e8f0; border-radius: 4px; padding: 0 4px; }

@@ -1,0 +1,9 @@
+body { margin: 0; font-family: system-ui, sans-serif; color: #1e293b; background: #f1f5f9; }
+.app { max-width: 38rem; margin: 20px auto; padding: 0 16px 24px; }
+h1 { margin: 0 0 14px; font-size: 1.6rem; }
+h2 { margin: 22px 0 8px; font-size: 1.15rem; }
+canvas { width: 100%; height: auto; background: #fff; border: 1px solid #cbd5e1; border-radius: 14px; }
+ul { list-style: none; padding: 0; margin: 12px 0 0; display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; }
+li { display: grid; text-align: center; background: #fff; border: 1px solid #cbd5e1; border-radius: 10px; padding: 8px; }
+.day { font-size: 0.8rem; color: #64748b; }
+.temp { font-weight: 700; }
