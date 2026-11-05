@@ -5,6 +5,29 @@ import { data, elementCount, sectionUrl, sources } from "../data";
 
 const examples = data.sections.flatMap((s) => s.elements).filter((e) => e.example).length;
 const standardCount = data.sections.filter((s) => s.kind === "standard").reduce((n, s) => n + s.elements.reduce((m, e) => m + e.names.length, 0), 0);
+
+// Plain-language guide for beginners, written by hand (UI copy, not quoted). Keyed by section
+// slug: if the standard renames a section, the build fails here until its sentence is updated.
+const GUIDE: Record<string, string> = {
+  "the-document-element": "The tag that wraps your whole page: every other tag goes inside it.",
+  "document-metadata": "Information visitors don't see on the page: its title in the browser tab, its description, links to CSS files.",
+  sections: "The big building blocks of a page: header, navigation menu, articles, sidebars, footer and headings.",
+  "grouping-content": "Organize your text into blocks: paragraphs, bulleted and numbered lists, quotes, generic boxes.",
+  "text-level-semantics": "Give meaning to words inside a sentence: links, emphasis, important words, code, dates, line breaks.",
+  edits: "Show what was added to or removed from a text, like tracked changes in a document.",
+  "embedded-content": "Put images, videos, sound, other web pages, drawings and math formulas into your page.",
+  "tabular-data": "Build tables of data, with rows, columns, header cells and a caption.",
+  forms: "Let visitors type, choose and send information: text fields, checkboxes, drop-down lists, buttons.",
+  "interactive-elements": "Ready-made interactive widgets: sections that open and close on click, and dialog boxes.",
+  scripting: "Add JavaScript to your page, and prepare content that scripts fill in or draw on.",
+  obsolete: "Old tags you may still find in old code. Don't use them: each one tells you what to use instead.",
+  proposals: "New tags still being tested, or that only one browser supports. Check their support before using them.",
+};
+const guide = (slug: string) => {
+  const sentence = GUIDE[slug];
+  if (!sentence) throw new Error(`No beginner sentence for section "${slug}" in src/pages/index.astro`);
+  return sentence;
+};
 ---
 
 <Base title="HTML Elements" description={`Every HTML element, ${elementCount} in all, with live editable examples, attributes and browser support, quoted from the WHATWG HTML standard and MDN.`}>
@@ -13,8 +36,8 @@ const standardCount = data.sections.filter((s) => s.kind === "standard").reduce(
       <p class="eyebrow">{standardCount} standard elements · {elementCount - standardCount} obsolete or proposed · {examples} live examples</p>
       <h1>Every HTML element,<br /><span class="gradient">alive.</span></h1>
       <p class="tagline">
-        See each element render, edit its code, and read what the HTML standard says about it. Every description is quoted from the
-        WHATWG HTML Living Standard and MDN, nothing is paraphrased.
+        See each element render, edit its code, and read what the HTML standard says about it. Every element description is quoted
+        from the WHATWG HTML Living Standard and MDN, nothing is paraphrased.
       </p>
       <Search large />
       <p class="sources">Sources synced: WHATWG standard of {sources.whatwg}, MDN of {sources.mdn.split(" ")[0]}.</p>
@@ -32,6 +55,7 @@ const standardCount = data.sections.filter((s) => s.kind === "standard").reduce(
               <a class="cover" href={sectionUrl(s)}>
                 <span class="number">{s.kind === "standard" ? s.number : s.kind === "obsolete" ? "Do not use" : "Outside the standard"}</span>
                 <span class="title">{s.title}</span>
+                <span class="guide">{guide(s.slug)}</span>
                 <span class="count">{names.length} {names.length > 1 ? "elements" : "element"}</span>
               </a>
               <ul class="tags">
@@ -48,6 +72,7 @@ const standardCount = data.sections.filter((s) => s.kind === "standard").reduce(
         <a class="cover" href="/global-attributes/">
           <span class="number">Attribute index</span>
           <span class="title">Global attributes</span>
+          <span class="guide">Attributes like id, class and hidden that work on every tag.</span>
           <span class="count">{data.globalAttributes.length} attributes</span>
         </a>
         <ul class="tags">
@@ -86,6 +111,7 @@ const standardCount = data.sections.filter((s) => s.kind === "standard").reduce(
   .obsolete .number { color: var(--bad); }
   .proposals .number { color: var(--warn); }
   .title { font-size: 1.2rem; font-weight: 700; letter-spacing: -0.01em; }
+  .guide { font-size: 0.95rem; line-height: 1.5; color: var(--fg); margin: 0.35rem 0 0.5rem; }
   .count { font-size: 0.85rem; color: var(--muted); }
   .tags { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 0.35rem; }
   .tags a { text-decoration: none; }

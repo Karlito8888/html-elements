@@ -7,7 +7,10 @@ read it by path.
 - **Quoted, never written.** Element descriptions, attributes, examples, status and support
   come only from the official sources through `bun run sync`. Never hand-edit
   `data/elements.json` or `data/sources.json`, never write a description or an example
-  from memory. Fix a wrong value in `scripts/sync.ts`, then re-run the sync.
+  from memory. Fix a wrong value in `scripts/sync.ts`, then re-run the sync. The one
+  exception is UI copy, such as the beginner sentence on each home-page card (`GUIDE` in
+  `src/pages/index.astro`): it is hand-written and must only name elements the section
+  actually contains.
 - **No em dash** in any UI text.
 - **Full Bun.** `bun add` / `bun install` only, `bun.lock` is the one lockfile.
 - **The gate is `bun run check`** (`astro check && astro build`), zero errors, run before
