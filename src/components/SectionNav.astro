@@ -1,0 +1,72 @@
+---
+import { data, sectionUrl, type Section } from "../data";
+
+interface Props {
+  current: Section | null;
+}
+const { current } = Astro.props;
+---
+
+<nav class="sidebar" aria-label="Elements and sections">
+  <details open>
+    <summary>Navigation</summary>
+    {
+      current && (
+        <>
+          <h2>On this page</h2>
+          <ol class="elements">
+            {current.elements.map((e) => (
+              <li>
+                <a href={`#${e.id}`}>
+                  <code>{e.names.length > 1 ? `${e.names[0]}–${e.names.at(-1)}` : e.names[0]}</code>
+                </a>
+              </li>
+            ))}
+          </ol>
+        </>
+      )
+    }
+    <h2>Sections</h2>
+    <ol class="sections">
+      {
+        data.sections.map((s) => (
+          <li>
+            <a href={sectionUrl(s)} aria-current={s === current ? "page" : undefined}>
+              {s.title}
+            </a>
+          </li>
+        ))
+      }
+      <li>
+        <a href="/global-attributes/" aria-current={current ? undefined : "page"}>Global attributes</a>
+      </li>
+    </ol>
+  </details>
+</nav>
+
+<script>
+  // Collapsed by default on small screens, where the sidebar sits above the content.
+  const details = document.querySelector<HTMLDetailsElement>(".sidebar details");
+  if (details && matchMedia("(max-width: 64rem)").matches) details.open = false;
+</script>
+
+<style>
+  .sidebar {
+    position: sticky; top: calc(var(--header-h) + 1.5rem); align-self: start;
+    max-height: calc(100dvh - var(--header-h) - 3rem); overflow: auto; padding-right: 0.5rem; font-size: 0.9rem;
+  }
+  summary { display: none; }
+  h2 { font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.09em; color: var(--muted); margin: 1.25rem 0 0.5rem; }
+  h2:first-of-type { margin-top: 0; }
+  ol { list-style: none; margin: 0; padding: 0; display: grid; gap: 0.1rem; }
+  .elements { grid-template-columns: repeat(auto-fill, minmax(6.5rem, 1fr)); }
+  a { display: block; padding: 0.2rem 0.55rem; border-radius: 7px; color: var(--fg); text-decoration: none; }
+  a:hover { background: var(--bg-soft); }
+  a[aria-current="page"] { background: var(--accent-soft); color: var(--accent); font-weight: 600; }
+  code { background: none !important; border: 0 !important; padding: 0 !important; font-size: 0.85rem; }
+  @media (max-width: 64rem) {
+    .sidebar { position: static; max-height: none; border: 1px solid var(--border); border-radius: var(--radius); padding: 0.75rem 1rem; }
+    summary { display: list-item; cursor: pointer; font-weight: 600; }
+    details[open] summary { margin-bottom: 0.75rem; }
+  }
+</style>

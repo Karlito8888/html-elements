@@ -1,0 +1,68 @@
+---
+import ElementBlock from "../components/ElementBlock.astro";
+import SectionNav from "../components/SectionNav.astro";
+import Base from "../layouts/Base.astro";
+import { data, type Section } from "../data";
+
+export function getStaticPaths() {
+  return data.sections.map((section) => ({ params: { section: section.slug }, props: { section } }));
+}
+
+interface Props {
+  section: Section;
+}
+
+const { section } = Astro.props;
+const names = section.elements.flatMap((e) => e.names);
+const description = `${section.title}: ${names.map((n) => `<${n}>`).join(", ")}. Descriptions, attributes, browser support and live examples, from the WHATWG HTML standard and MDN.`;
+---
+
+<Base title={section.title} description={description}>
+  <div class="container layout">
+    <SectionNav current={section} />
+    <div class="body">
+      <header class="intro">
+        {section.number && <p class="eyebrow">{section.kind === "standard" ? `Section ${section.number}` : `WHATWG §${section.number}`}</p>}
+        <h1>{section.title}</h1>
+        {
+          section.kind === "standard" && (
+            <p>
+              {section.elements.length} {section.elements.length > 1 ? "entries" : "entry"} from this section of the HTML Living Standard, in the
+              order the standard presents them.
+            </p>
+          )
+        }
+        {
+          section.kind === "obsolete" && (
+            <p>
+              These elements are entirely obsolete: the HTML standard says they must not be used by authors. Each one lists the
+              replacement the standard recommends.
+            </p>
+          )
+        }
+        {
+          section.kind === "proposals" && (
+            <p>
+              Elements listed by MDN's browser-compat-data that are not part of the HTML Living Standard: proposals from other
+              groups, or features shipped by a single browser. Check their support before using them.
+            </p>
+          )
+        }
+        {section.spec && <a class="spec" href={section.spec}>Read this section of the standard ↗</a>}
+      </header>
+      {section.elements.map((element) => <ElementBlock element={element} section={section} />)}
+    </div>
+  </div>
+</Base>
+
+<style>
+  .layout { display: grid; grid-template-columns: 15rem minmax(0, 1fr); gap: 3rem; padding-top: 2rem; }
+  @media (max-width: 64rem) {
+    .layout { grid-template-columns: minmax(0, 1fr); gap: 1rem; }
+  }
+  .intro { padding: 1rem 0 1.5rem; border-bottom: 1px solid var(--border); }
+  .eyebrow { margin: 0; color: var(--accent); font-weight: 700; font-size: 0.85rem; letter-spacing: 0.06em; text-transform: uppercase; }
+  h1 { margin: 0.2rem 0 0.75rem; font-size: clamp(2.2rem, 5vw, 3.4rem); font-weight: 800; letter-spacing: -0.03em; line-height: 1.1; }
+  .intro p { color: var(--muted); max-width: 70ch; font-size: 1.05rem; }
+  .spec { font-weight: 600; }
+</style>

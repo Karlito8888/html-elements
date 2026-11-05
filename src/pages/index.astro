@@ -1,0 +1,95 @@
+---
+import Search from "../components/Search.astro";
+import Base from "../layouts/Base.astro";
+import { data, elementCount, sectionUrl, sources } from "../data";
+
+const examples = data.sections.flatMap((s) => s.elements).filter((e) => e.example).length;
+const standardCount = data.sections.filter((s) => s.kind === "standard").reduce((n, s) => n + s.elements.reduce((m, e) => m + e.names.length, 0), 0);
+---
+
+<Base title="HTML Elements" description={`Every HTML element, ${elementCount} in all, with live editable examples, attributes and browser support, quoted from the WHATWG HTML standard and MDN.`}>
+  <section class="hero">
+    <div class="container">
+      <p class="eyebrow">{standardCount} standard elements · {elementCount - standardCount} obsolete or proposed · {examples} live examples</p>
+      <h1>Every HTML element,<br /><span class="gradient">alive.</span></h1>
+      <p class="tagline">
+        See each element render, edit its code, and read what the HTML standard says about it. Every description is quoted from the
+        WHATWG HTML Living Standard and MDN, nothing is paraphrased.
+      </p>
+      <Search large />
+      <p class="sources">Sources synced: WHATWG standard of {sources.whatwg}, MDN of {sources.mdn.split(" ")[0]}.</p>
+    </div>
+  </section>
+
+  <section class="container sections" aria-labelledby="sections-title">
+    <h2 id="sections-title">Browse by section of the standard</h2>
+    <ul class="grid">
+      {
+        data.sections.map((s) => {
+          const names = s.elements.flatMap((e) => e.names);
+          return (
+            <li class:list={["card", s.kind]}>
+              <a class="cover" href={sectionUrl(s)}>
+                <span class="number">{s.kind === "standard" ? s.number : s.kind === "obsolete" ? "Do not use" : "Outside the standard"}</span>
+                <span class="title">{s.title}</span>
+                <span class="count">{names.length} {names.length > 1 ? "elements" : "element"}</span>
+              </a>
+              <ul class="tags">
+                {s.elements.slice(0, 8).map((e) => (
+                  <li><a href={`${sectionUrl(s)}#${e.id}`}><code>{e.names.length > 1 ? `${e.names[0]}–${e.names.at(-1)}` : e.names[0]}</code></a></li>
+                ))}
+                {s.elements.length > 8 && <li class="more">+{s.elements.length - 8}</li>}
+              </ul>
+            </li>
+          );
+        })
+      }
+      <li class="card">
+        <a class="cover" href="/global-attributes/">
+          <span class="number">Attribute index</span>
+          <span class="title">Global attributes</span>
+          <span class="count">{data.globalAttributes.length} attributes</span>
+        </a>
+        <ul class="tags">
+          {data.globalAttributes.slice(0, 8).map((a) => <li><a href={`/global-attributes/#${a.name}`}><code>{a.name}</code></a></li>)}
+          <li class="more">+{data.globalAttributes.length - 8}</li>
+        </ul>
+      </li>
+    </ul>
+  </section>
+</Base>
+
+<style>
+  .hero {
+    position: relative; overflow: hidden; padding: clamp(3rem, 9vw, 7rem) 0 clamp(2.5rem, 6vw, 4.5rem); text-align: center;
+    background:
+      radial-gradient(60rem 30rem at 15% -10%, color-mix(in srgb, #f06529 22%, transparent), transparent 60%),
+      radial-gradient(50rem 28rem at 90% 0%, color-mix(in srgb, #a855f7 20%, transparent), transparent 60%);
+    border-bottom: 1px solid var(--border);
+  }
+  .hero .container { display: flex; flex-direction: column; align-items: center; }
+  .eyebrow { margin: 0 0 1rem; font-size: 0.85rem; font-weight: 600; color: var(--muted); }
+  h1 { margin: 0; font-size: clamp(2.6rem, 8vw, 5.2rem); font-weight: 800; letter-spacing: -0.045em; line-height: 1.02; }
+  .gradient { background: linear-gradient(90deg, #e34c26, #f06529 40%, #a855f7); -webkit-background-clip: text; background-clip: text; color: transparent; }
+  .tagline { max-width: 44rem; margin: 1.5rem auto 2rem; font-size: clamp(1.05rem, 2vw, 1.25rem); color: var(--muted); }
+  .sources { margin: 1.25rem 0 0; font-size: 0.8rem; color: var(--muted); }
+  .sections { padding-top: 3rem; }
+  .sections h2 { font-size: 1.5rem; letter-spacing: -0.02em; margin: 0 0 1.25rem; }
+  .grid { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 19rem), 1fr)); gap: 1rem; }
+  .card {
+    border: 1px solid var(--border); border-radius: var(--radius); background: var(--surface); padding: 1.2rem;
+    display: flex; flex-direction: column; gap: 0.9rem; transition: border-color 0.15s, transform 0.15s, box-shadow 0.15s;
+  }
+  .card:hover { border-color: var(--accent); transform: translateY(-2px); box-shadow: 0 18px 40px -28px color-mix(in srgb, var(--fg) 60%, transparent); }
+  .cover { display: grid; gap: 0.15rem; color: var(--fg); text-decoration: none; }
+  .number { font-size: 0.75rem; font-weight: 700; color: var(--accent); letter-spacing: 0.05em; text-transform: uppercase; }
+  .obsolete .number { color: var(--bad); }
+  .proposals .number { color: var(--warn); }
+  .title { font-size: 1.2rem; font-weight: 700; letter-spacing: -0.01em; }
+  .count { font-size: 0.85rem; color: var(--muted); }
+  .tags { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 0.35rem; }
+  .tags a { text-decoration: none; }
+  .tags code { font-size: 0.78rem; }
+  .tags a:hover code { border-color: var(--accent); color: var(--accent); }
+  .more { font-size: 0.78rem; color: var(--muted); align-self: center; }
+</style>

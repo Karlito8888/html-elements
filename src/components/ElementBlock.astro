@@ -1,0 +1,163 @@
+---
+import Example from "./Example.astro";
+import { BROWSERS, type Element, type Section } from "../data";
+
+interface Props {
+  element: Element;
+  section: Section;
+}
+
+const { element: e, section } = Astro.props;
+const label = e.names.map((n) => `<${n}>`).join(", ");
+const standard = section.kind === "standard";
+
+const month = (date: string) => {
+  const approx = date.startsWith("≤");
+  const d = new Date(date.replace("≤", ""));
+  return `${approx ? "≤ " : ""}${d.toLocaleDateString("en", { month: "long", year: "numeric", timeZone: "UTC" })}`;
+};
+// Wording from the web-features README: widely available, newly available, limited availability.
+const baseline = e.baseline && {
+  high: { cls: "good", text: "Baseline: widely available", since: e.baseline.highDate },
+  low: { cls: "good", text: "Baseline: newly available", since: e.baseline.lowDate },
+  false: { cls: "warn", text: "Limited availability", since: null },
+}[String(e.baseline.status) as "high" | "low" | "false"];
+---
+
+<article class="element" id={e.id} aria-labelledby={`${e.id}-title`}>
+  <header>
+    <h2 id={`${e.id}-title`}>
+      <a href={`#${e.id}`}>{e.names.map((n) => <code>&lt;{n}&gt;</code>)}</a>
+    </h2>
+    <div class="badges">
+      {baseline && <span class:list={["badge", baseline.cls]}>{baseline.text}{baseline.since && <span class="since">since {month(baseline.since)}</span>}</span>}
+      {section.kind === "obsolete" && <span class="badge bad">Obsolete</span>}
+      {e.status.deprecated && section.kind !== "obsolete" && <span class="badge bad">Deprecated</span>}
+      {e.status.experimental && <span class="badge warn">Experimental</span>}
+      {!e.status.standardTrack && <span class="badge warn">Non-standard</span>}
+    </div>
+  </header>
+
+  {
+    e.advice && (
+      <p class="banner">
+        <strong>Do not use.</strong> <span class="src">WHATWG</span> <Fragment set:html={e.advice} />
+      </p>
+    )
+  }
+  {e.whatwg && <p class="lead"><span class="src">WHATWG</span> <Fragment set:html={e.whatwg} /></p>}
+  {e.mdn?.summary && <p class="summary"><span class="src">MDN</span> <Fragment set:html={e.mdn.summary} /></p>}
+  {!e.whatwg && !e.advice && !e.mdn && <p class="summary muted">No WHATWG entry and no MDN page: only browser-compat-data lists this element.</p>}
+
+  {e.example && <Example example={e.example} id={e.id} label={label} />}
+
+  <div class="facts">
+    {
+      standard && (
+        <section class="card">
+          <h3>Content model</h3>
+          <dl class="model">
+            <dt>Categories</dt><dd set:html={e.categories} />
+            <dt>Parents</dt><dd set:html={e.parents} />
+            <dt>Children</dt><dd set:html={e.children} />
+            <dt>Interface</dt><dd set:html={e.interface} />
+          </dl>
+        </section>
+      )
+    }
+    {
+      e.support && (
+        <section class="card">
+          <h3>Browser support</h3>
+          <table class="support">
+            <caption class="visually-hidden">First browser version supporting {label}</caption>
+            <tbody>
+              {Object.entries(BROWSERS).map(([key, name]) => (
+                <tr>
+                  <th scope="row">{name}</th>
+                  <td class:list={{ no: e.support![key].startsWith("No") }}>{e.support![key]}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+          <p class="note">First version with support, from MDN browser-compat-data.</p>
+        </section>
+      )
+    }
+    {
+      standard && (
+        <section class="card wide">
+          <h3>Attributes</h3>
+          {e.attrsNote && <p>Attributes: <Fragment set:html={e.attrsNote} />.</p>}
+          {!e.attrsNote && !e.attributes.length && <p class="muted">No element-specific attribute.</p>}
+          {
+            e.attributes.length > 0 && (
+              <dl class="attrs">
+                {e.attributes.map((a) => (
+                  <div>
+                    <dt><a href={a.href}><code>{a.name}</code></a></dt>
+                    <dd>
+                      <Fragment set:html={a.desc || "Not described in the WHATWG attribute index: follow the link to its definition."} />
+                      {a.value && <span class="value">Value: <Fragment set:html={a.value} /></span>}
+                    </dd>
+                  </div>
+                ))}
+              </dl>
+            )
+          }
+          {e.globals && <p class="note">Also accepts the <a href="/global-attributes/">global attributes</a>.</p>}
+        </section>
+      )
+    }
+  </div>
+
+  <p class="links">
+    {e.spec && <a href={e.spec}>Specification ↗</a>}
+    {e.mdn && <a href={e.mdn.url}>MDN reference ↗</a>}
+  </p>
+</article>
+
+<style>
+  .element { padding: 3rem 0; border-bottom: 1px solid var(--border); scroll-margin-top: calc(var(--header-h) + 1rem); }
+  .element:target h2 a { color: var(--accent); }
+  header { display: flex; flex-wrap: wrap; align-items: center; gap: 0.6rem 1rem; }
+  h2 { margin: 0; font-size: clamp(1.6rem, 3vw, 2.1rem); font-weight: 800; letter-spacing: -0.02em; }
+  h2 a { color: inherit; text-decoration: none; display: inline-flex; gap: 0.5rem; flex-wrap: wrap; }
+  h2 code { font-family: var(--font-mono), monospace; background: none !important; border: 0 !important; padding: 0 !important; font-size: 1em !important; }
+  .badges { display: flex; flex-wrap: wrap; gap: 0.4rem; }
+  .since { font-weight: 400; }
+  .src {
+    display: inline-block; vertical-align: 0.15em; font-size: 0.65rem; font-weight: 700; letter-spacing: 0.05em;
+    color: var(--muted); border: 1px solid var(--border); border-radius: 5px; padding: 0 0.35rem; margin-right: 0.25rem;
+  }
+  .lead { font-size: 1.2rem; font-weight: 500; margin: 1rem 0 0.4rem; }
+  .summary { color: var(--muted); max-width: 80ch; margin: 0.4rem 0; }
+  .muted { color: var(--muted); }
+  .banner {
+    margin: 1rem 0; padding: 0.8rem 1rem; border-radius: 12px; border: 1px solid color-mix(in srgb, var(--bad) 40%, transparent);
+    background: color-mix(in srgb, var(--bad) 8%, transparent);
+  }
+  .banner strong { color: var(--bad); }
+  .facts { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 22rem), 1fr)); gap: 1rem; margin-top: 1.25rem; }
+  .card { border: 1px solid var(--border); border-radius: var(--radius); padding: 1rem 1.2rem; background: var(--surface); min-width: 0; }
+  .wide { grid-column: 1 / -1; }
+  h3 { margin: 0 0 0.75rem; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); }
+  .model { display: grid; grid-template-columns: max-content 1fr; gap: 0.4rem 1rem; margin: 0; font-size: 0.92rem; }
+  .model dt { color: var(--muted); }
+  .model dd { margin: 0; }
+  .support { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
+  .support th { text-align: left; font-weight: 500; padding: 0.25rem 0; }
+  .support td { text-align: right; font-family: var(--font-mono), monospace; font-size: 0.85rem; }
+  .support tr + tr { border-top: 1px solid var(--border); }
+  .support .no { color: var(--bad); }
+  .attrs { margin: 0; display: grid; gap: 0.1rem; font-size: 0.92rem; }
+  .attrs > div { display: grid; grid-template-columns: minmax(9rem, 14rem) 1fr; gap: 1rem; padding: 0.55rem 0; border-top: 1px solid var(--border); }
+  .attrs > div:first-child { border-top: 0; }
+  .attrs dd { margin: 0; }
+  .value { display: block; color: var(--muted); font-size: 0.85rem; margin-top: 0.15rem; }
+  @media (max-width: 40rem) {
+    .attrs > div { grid-template-columns: 1fr; gap: 0.2rem; }
+  }
+  .note { color: var(--muted); font-size: 0.8rem; margin: 0.75rem 0 0; }
+  .links { display: flex; gap: 1.25rem; margin: 1.25rem 0 0; font-weight: 500; }
+</style>

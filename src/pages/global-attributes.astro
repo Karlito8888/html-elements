@@ -1,0 +1,53 @@
+---
+import SectionNav from "../components/SectionNav.astro";
+import Base from "../layouts/Base.astro";
+import { data } from "../data";
+---
+
+<Base title="Global attributes" description="The attributes every HTML element accepts, from the WHATWG HTML Living Standard attribute index.">
+  <div class="container layout">
+    <SectionNav current={null} />
+    <div>
+      <header class="intro">
+        <p class="eyebrow">Attribute index</p>
+        <h1>Global attributes</h1>
+        <p>
+          The {data.globalAttributes.length} attributes the WHATWG attribute index lists for all HTML elements. Event handler attributes
+          (<code>onclick</code> and the rest) have their own <a href="https://html.spec.whatwg.org/multipage/indices.html#ix-event-handlers">index in the standard</a>.
+        </p>
+        <a class="spec" href="https://html.spec.whatwg.org/multipage/dom.html#global-attributes">Read the definition in the standard ↗</a>
+      </header>
+      <dl class="globals">
+        {
+          data.globalAttributes.map((a) => (
+            <div id={a.name}>
+              <dt><code>{a.name}</code></dt>
+              <dd>
+                <Fragment set:html={a.desc} />
+                {a.value && <span class="value">Value: <Fragment set:html={a.value} /></span>}
+              </dd>
+            </div>
+          ))
+        }
+      </dl>
+    </div>
+  </div>
+</Base>
+
+<style>
+  .layout { display: grid; grid-template-columns: 15rem minmax(0, 1fr); gap: 3rem; padding-top: 2rem; }
+  @media (max-width: 64rem) {
+    .layout { grid-template-columns: minmax(0, 1fr); gap: 1rem; }
+  }
+  .intro { padding: 1rem 0 1.5rem; }
+  .eyebrow { margin: 0; color: var(--accent); font-weight: 700; font-size: 0.85rem; letter-spacing: 0.06em; text-transform: uppercase; }
+  h1 { margin: 0.2rem 0 0.75rem; font-size: clamp(2.2rem, 5vw, 3.4rem); font-weight: 800; letter-spacing: -0.03em; line-height: 1.1; }
+  .intro p { color: var(--muted); max-width: 70ch; font-size: 1.05rem; }
+  .spec { font-weight: 600; }
+  .globals { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 20rem), 1fr)); gap: 1rem; margin: 1rem 0 0; }
+  .globals > div { border: 1px solid var(--border); border-radius: var(--radius); padding: 1rem 1.2rem; background: var(--surface); scroll-margin-top: calc(var(--header-h) + 1rem); }
+  .globals > div:target { border-color: var(--accent); }
+  dt code { font-size: 1rem; font-weight: 600; color: var(--accent); }
+  dd { margin: 0.4rem 0 0; }
+  .value { display: block; color: var(--muted); font-size: 0.85rem; margin-top: 0.3rem; }
+</style>

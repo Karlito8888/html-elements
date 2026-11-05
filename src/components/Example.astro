@@ -1,0 +1,105 @@
+---
+import { Code } from "astro:components";
+import type { Example } from "../data";
+
+interface Props {
+  example: Example;
+  id: string;
+  label: string;
+}
+
+const { example, id, label } = Astro.props;
+const LANGS = [
+  { key: "html", shiki: "html", title: "HTML" },
+  { key: "css", shiki: "css", title: "CSS" },
+  { key: "js", shiki: "javascript", title: "JS" },
+] as const;
+const tabs = LANGS.filter((l) => example[l.key]);
+// Embedded as JSON for the client; escaping "<" keeps "</script>" inside the code from closing the tag.
+const source = JSON.stringify(example).replace(/</g, "\\u003c");
+---
+
+<div class="example" data-example={id}>
+  <div class="preview">
+    <div class="bar">
+      <span class="dot" aria-hidden="true"></span>
+      <span>Live preview</span>
+      <span class="hint">Example from MDN</span>
+    </div>
+    <div class="frame" data-frame data-label={label}></div>
+  </div>
+  <div class="code">
+    <div class="bar">
+      <div role="tablist" aria-label={`Code of the ${label} example`}>
+        {
+          tabs.map((t, i) => (
+            <button
+              type="button"
+              role="tab"
+              id={`${id}-tab-${t.key}`}
+              aria-controls={`${id}-panel-${t.key}`}
+              aria-selected={i === 0 ? "true" : "false"}
+              tabindex={i === 0 ? 0 : -1}
+            >
+              {t.title}
+            </button>
+          ))
+        }
+      </div>
+      <div class="actions">
+        <button type="button" class="button small" data-action="edit" aria-pressed="false">Edit</button>
+        <button type="button" class="button small" data-action="reset" hidden>Reset</button>
+        <button type="button" class="button small" data-action="copy">Copy</button>
+      </div>
+    </div>
+    {
+      tabs.map((t, i) => (
+        <div role="tabpanel" id={`${id}-panel-${t.key}`} aria-labelledby={`${id}-tab-${t.key}`} data-panel={t.key} hidden={i !== 0}>
+          <Code code={example[t.key] ?? ""} lang={t.shiki} themes={{ light: "github-light", dark: "github-dark" }} wrap />
+        </div>
+      ))
+    }
+  </div>
+  <script type="application/json" data-source set:html={source} />
+</div>
+
+<script>
+  import "../scripts/examples";
+</script>
+
+<style>
+  .example {
+    container-type: inline-size;
+    display: grid; grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr);
+    border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden;
+    background: var(--surface); margin: 1.5rem 0;
+    box-shadow: 0 20px 45px -30px color-mix(in srgb, var(--fg) 45%, transparent);
+  }
+  @media (max-width: 64rem) {
+    .example { grid-template-columns: minmax(0, 1fr); }
+    .code { border-left: 0 !important; border-top: 1px solid var(--border); }
+  }
+  .bar {
+    display: flex; align-items: center; gap: 0.5rem; min-height: 2.75rem; padding: 0.4rem 0.75rem;
+    border-bottom: 1px solid var(--border); font-size: 0.8rem; font-weight: 600; color: var(--muted);
+  }
+  .dot { width: 0.55rem; height: 0.55rem; border-radius: 50%; background: var(--good); box-shadow: 0 0 0 3px color-mix(in srgb, var(--good) 25%, transparent); }
+  .hint { margin-left: auto; font-weight: 400; }
+  .preview { display: flex; flex-direction: column; background: var(--bg-soft); }
+  .frame { flex: 1; padding: 0.75rem; display: flex; }
+  .frame :global(iframe) {
+    width: 100%; height: 220px; border: 0; border-radius: 10px; background: #fff;
+    box-shadow: 0 0 0 1px var(--border);
+  }
+  .code { border-left: 1px solid var(--border); display: flex; flex-direction: column; min-width: 0; background: var(--code-bg); }
+  [role="tablist"] { display: flex; gap: 0.25rem; }
+  [role="tab"] {
+    font: inherit; font-size: 0.8rem; font-weight: 600; color: var(--muted); cursor: pointer;
+    background: none; border: 0; border-radius: 8px; padding: 0.3rem 0.65rem;
+  }
+  [role="tab"][aria-selected="true"] { color: var(--accent); background: var(--accent-soft); }
+  .actions { margin-left: auto; display: flex; gap: 0.35rem; }
+  .small { font-size: 0.75rem; padding: 0.2rem 0.65rem; }
+  [role="tabpanel"] { max-height: 32rem; overflow: auto; }
+  [role="tabpanel"] :global(pre) { margin: 0; padding: 1rem; font-size: 0.82rem; line-height: 1.6; }
+</style>
