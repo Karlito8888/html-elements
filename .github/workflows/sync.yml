@@ -8,11 +8,10 @@ jobs:
     runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v7
-      - uses: actions/setup-node@v7
-        with: { node-version: 24 }
-      - uses: oven-sh/setup-bun@v2
-      - run: bun install --frozen-lockfile
-      - run: bun run sync
+      - uses: voidzero-dev/setup-vp@v1.22.0
+        with: { node-version: "24", cache: true }
+      - run: vp install --frozen-lockfile
+      - run: vp run sync
       # data/sources.json changes on nearly every run (spec date, MDN commit): only a change
       # to the element data is worth a pull request.
       - name: Open a pull request when the element data changed
@@ -22,7 +21,7 @@ jobs:
             echo "Element data unchanged."
             exit 0
           fi
-          bun run check
+          vp run gate
           branch="sync/$(date -u +%Y-%m-%d)"
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
@@ -32,4 +31,4 @@ jobs:
           git push origin "$branch"
           gh pr create --base main --head "$branch" \
             --title "chore(data): sync official sources $(date -u +%Y-%m-%d)" \
-            --body "Weekly \`bun run sync\`. The build passed on this data. Merging deploys the site."
+            --body "Weekly \`vp run sync\`. The build passed on this data. Merging deploys the site."

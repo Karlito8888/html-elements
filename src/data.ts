@@ -6,7 +6,12 @@ import sourcesJson from "../data/sources.json";
 
 export type Attribute = { name: string; desc: string; value: string; href: string | null };
 
-export type Baseline = { feature: string; status: "high" | "low" | false; lowDate: string | null; highDate: string | null };
+export type Baseline = {
+  feature: string;
+  status: "high" | "low" | false;
+  lowDate: string | null;
+  highDate: string | null;
+};
 
 export type Example = { html: string; css: string | null; js: string | null };
 
@@ -57,6 +62,9 @@ export const BROWSERS: Record<string, string> = {
   safari_ios: "Safari iOS",
 };
 
-export const elementCount = data.sections.reduce((n, s) => n + s.elements.reduce((m, e) => m + e.names.length, 0), 0);
+export const elementCount = data.sections.reduce(
+  (n, s) => n + s.elements.reduce((m, e) => m + e.names.length, 0),
+  0,
+);
 
 export const sectionUrl = (s: Section) => `/${s.slug}/`;

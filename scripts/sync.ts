@@ -7,7 +7,7 @@
  * - MDN browser-compat-data (npm @mdn/browser-compat-data): status flags and browser support.
  * - web-features (npm web-features): Baseline status.
  *
- * Run: bun run sync
+ * Run: vp run sync
  */
 
 import { $ } from "bun";
@@ -35,11 +35,16 @@ async function get(url: string): Promise<Response> {
 }
 
 /** Download an npm package tarball and return the parsed JSON of one file inside it. */
-async function npmJson(pkg: string, file: string, dir: string): Promise<{ version: string; json: unknown }> {
+async function npmJson(
+  pkg: string,
+  file: string,
+  dir: string,
+): Promise<{ version: string; json: unknown }> {
   const meta: unknown = await (await get(`https://registry.npmjs.org/${pkg}/latest`)).json();
   const tarball = at(meta, ["dist", "tarball"]);
   const version = at(meta, ["version"]);
-  if (typeof tarball !== "string" || typeof version !== "string") throw new Error(`npm metadata of ${pkg} has no tarball`);
+  if (typeof tarball !== "string" || typeof version !== "string")
+    throw new Error(`npm metadata of ${pkg} has no tarball`);
   const tgz = join(dir, `${pkg.replace(/\W/g, "_")}.tgz`);
   await Bun.write(tgz, await get(tarball));
   const out = join(dir, pkg.replace(/\W/g, "_"));
@@ -47,7 +52,8 @@ async function npmJson(pkg: string, file: string, dir: string): Promise<{ versio
   return { version, json: await Bun.file(join(out, "package", file)).json() };
 }
 
-const isRecord = (v: unknown): v is Record<string, unknown> => typeof v === "object" && v !== null && !Array.isArray(v);
+const isRecord = (v: unknown): v is Record<string, unknown> =>
+  typeof v === "object" && v !== null && !Array.isArray(v);
 
 /** Read a nested property of untyped JSON; undefined as soon as a step is not an object. */
 function at(value: unknown, path: string[]): unknown {
@@ -60,37 +66,56 @@ function at(value: unknown, path: string[]): unknown {
 // start tags instead of being parsed as a tree.
 
 const HREF = /href=(?:"([^"]*)"|([^\s>]+))/;
-const ENTITIES: Record<string, string> = { amp: "&", lt: "<", gt: ">", quot: '"', apos: "'", nbsp: "\u00a0" };
+const ENTITIES: Record<string, string> = {
+  amp: "&",
+  lt: "<",
+  gt: ">",
+  quot: '"',
+  apos: "'",
+  nbsp: "\u00a0",
+};
 
 function unescape(s: string): string {
   return s.replace(/&(#x[\da-f]+|#\d+|\w+);/gi, (m, e: string) => {
-    if (e[0] === "#") return String.fromCodePoint(e[1].toLowerCase() === "x" ? parseInt(e.slice(2), 16) : parseInt(e.slice(1), 10));
+    if (e[0] === "#")
+      return String.fromCodePoint(
+        e[1].toLowerCase() === "x" ? parseInt(e.slice(2), 16) : parseInt(e.slice(1), 10),
+      );
     return ENTITIES[e.toLowerCase()] ?? m;
   });
 }
 
 function escape(s: string): string {
-  return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+  return s
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;");
 }
 
 function text(fragment: string): string {
-  return unescape(fragment.replace(/<[^>]+>/g, "")).replace(/\s+/g, " ").trim();
+  return unescape(fragment.replace(/<[^>]+>/g, ""))
+    .replace(/\s+/g, " ")
+    .trim();
 }
 
 /** Keep only <a href> (made absolute against `page`), <code> and <i>; drop every other tag and attribute. */
 function clean(fragment: string, page = "indices.html"): string {
-  const out = fragment.replace(/<(\/?)(\w+)([^>]*)>/g, (_, closing: string, name: string, attrs: string) => {
-    name = name.toLowerCase();
-    if (name === "code" || name === "i") return `<${closing}${name}>`;
-    if (name !== "a") return "";
-    if (closing) return "</a>";
-    const h = attrs.match(HREF);
-    if (!h) return "<a>";
-    let href = unescape(h[1] ?? h[2]);
-    if (href.startsWith("#")) href = SPEC + page + href;
-    else if (!href.startsWith("http")) href = SPEC + href;
-    return `<a href="${escape(href)}">`;
-  });
+  const out = fragment.replace(
+    /<(\/?)(\w+)([^>]*)>/g,
+    (_, closing: string, name: string, attrs: string) => {
+      name = name.toLowerCase();
+      if (name === "code" || name === "i") return `<${closing}${name}>`;
+      if (name !== "a") return "";
+      if (closing) return "</a>";
+      const h = attrs.match(HREF);
+      if (!h) return "<a>";
+      let href = unescape(h[1] ?? h[2]);
+      if (href.startsWith("#")) href = SPEC + page + href;
+      else if (!href.startsWith("http")) href = SPEC + href;
+      return `<a href="${escape(href)}">`;
+    },
+  );
   return out.replace(/\s+/g, " ").trim();
 }
 
@@ -104,7 +129,10 @@ const cells = (row: string) => row.split(/<t[hd]\b[^>]*>/).slice(1);
 const rows = (body: string) => body.split("<tr>").slice(1);
 
 function slugify(title: string): string {
-  return title.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
+  return title
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-|-$/g, "");
 }
 
 // ------------------------------------------------------------------ WHATWG
@@ -113,7 +141,9 @@ type Toc = Map<string, { num: string; title: string }>;
 
 function parseToc(toc: string): Toc {
   const out: Toc = new Map();
-  for (const m of toc.matchAll(/<a href=(?:"([^"]*)"|([^\s>]+))><span class=secno>([\d.]+)<\/span>([\s\S]*?)<\/a>/g)) {
+  for (const m of toc.matchAll(
+    /<a href=(?:"([^"]*)"|([^\s>]+))><span class=secno>([\d.]+)<\/span>([\s\S]*?)<\/a>/g,
+  )) {
     out.set(m[1] ?? m[2], { num: m[3], title: text(m[4]) });
   }
   return out;
@@ -135,23 +165,32 @@ function parseAttributes(indices: string): { byHref: Map<string, AttrInfo>; glob
       if (caption === "List of attributes" && text(c[1]) === "HTML elements") {
         globals.push({ ...info, href: null });
       }
-      for (const h of c[1].matchAll(new RegExp(HREF, "g"))) byHref.set(unescape(h[1] ?? h[2]), info);
+      for (const h of c[1].matchAll(new RegExp(HREF, "g")))
+        byHref.set(unescape(h[1] ?? h[2]), info);
     }
   }
   return { byHref, globals };
 }
 
-type Row = Omit<Element, "id" | "mdn" | "status" | "support" | "baseline" | "example" | "advice"> & { anchor: string };
+type Row = Omit<
+  Element,
+  "id" | "mdn" | "status" | "support" | "baseline" | "example" | "advice"
+> & { anchor: string };
 
 function parseElements(indices: string, attrs: Map<string, AttrInfo>): Row[] {
   const out: Row[] = [];
   for (const row of rows(tableBody(indices, "List of elements"))) {
     const c = cells(row);
-    let names = [...c[0].matchAll(/<code[^>]*><a href=([^ >]+)>([\w-]+)<\/a><\/code>/g)].map((m) => [m[1], m[2]]);
+    let names = [...c[0].matchAll(/<code[^>]*><a href=([^ >]+)>([\w-]+)<\/a><\/code>/g)].map(
+      (m) => [m[1], m[2]],
+    );
     if (!names.length) {
       // "SVG svg" and "MathML math" link to their own specifications.
-      names = [...c[0].matchAll(/<a [^>]*?href=(?:"([^"]*)"|([^\s>]+))[^>]*>(?:SVG|MathML) <code>([\w-]+)<\/code><\/a>/g)]
-        .map((m) => [m[1] ?? m[2], m[3]]);
+      names = [
+        ...c[0].matchAll(
+          /<a [^>]*?href=(?:"([^"]*)"|([^\s>]+))[^>]*>(?:SVG|MathML) <code>([\w-]+)<\/code><\/a>/g,
+        ),
+      ].map((m) => [m[1] ?? m[2], m[3]]);
     }
     if (!names.length) continue; // "autonomous custom elements" is a concept, not a tag name
 
@@ -167,7 +206,12 @@ function parseElements(indices: string, attrs: Map<string, AttrInfo>): Row[] {
       }
       if (href.includes("references.html")) continue;
       const info = attrs.get(href);
-      attributes.push({ name: text(m[3]), desc: info?.desc ?? "", value: info?.value ?? "", href: SPEC + href });
+      attributes.push({
+        name: text(m[3]),
+        desc: info?.desc ?? "",
+        value: info?.value ?? "",
+        href: SPEC + href,
+      });
     }
     const anchor = names[0][0];
     out.push({
@@ -176,7 +220,13 @@ function parseElements(indices: string, attrs: Map<string, AttrInfo>): Row[] {
       spec: anchor.startsWith("http") ? anchor : SPEC + anchor,
       whatwg: clean(c[1]),
       categories: clean(c[2]),
-      categoryList: [...new Set(text(c[2]).split(";").map((p) => p.replace(/\*/g, "").trim()))]
+      categoryList: [
+        ...new Set(
+          text(c[2])
+            .split(";")
+            .map((p) => p.replace(/\*/g, "").trim()),
+        ),
+      ]
         .filter((p) => p && p !== "none")
         .sort(),
       parents: clean(c[3]),
@@ -198,10 +248,13 @@ function parseObsolete(obsolete: string): { name: string; spec: string; advice: 
   let pending: [string, string][] = [];
   for (const m of dl.matchAll(/<(dt|dd)\b[^>]*>([\s\S]*?)(?=<dt\b|<dd\b|$)/g)) {
     if (m[1] === "dt") {
-      const d = m[2].match(/<dfn id=([\w-]+)[^>]*><code>([\w-]+)<\/code>/) ?? m[2].match(/<a href=#([\w-]+)>([\w-]+)<\/a>/);
+      const d =
+        m[2].match(/<dfn id=([\w-]+)[^>]*><code>([\w-]+)<\/code>/) ??
+        m[2].match(/<a href=#([\w-]+)>([\w-]+)<\/a>/);
       if (d) pending.push([d[2], `${SPEC}obsolete.html#${d[1]}`]);
     } else {
-      for (const [name, spec] of pending) out.push({ name, spec, advice: clean(m[2], "obsolete.html") });
+      for (const [name, spec] of pending)
+        out.push({ name, spec, advice: clean(m[2], "obsolete.html") });
       pending = [];
     }
   }
@@ -220,10 +273,14 @@ function mdInline(src: string): string {
     const macro = name.toLowerCase();
     if (macro === "htmlelement" && args.length) {
       const tag = args[0].toLowerCase();
-      return keep(`<a href="${MDN}Web/HTML/Reference/Elements/${tag}"><code>&lt;${escape(tag)}&gt;</code></a>`);
+      return keep(
+        `<a href="${MDN}Web/HTML/Reference/Elements/${tag}"><code>&lt;${escape(tag)}&gt;</code></a>`,
+      );
     }
     if (macro === "glossary" && args.length) {
-      return keep(`<a href="${MDN}Glossary/${args[0].replace(/ /g, "_")}">${escape(args.at(-1)!)}</a>`);
+      return keep(
+        `<a href="${MDN}Glossary/${args[0].replace(/ /g, "_")}">${escape(args.at(-1)!)}</a>`,
+      );
     }
     return args.length ? keep(`<code>${escape(args[0])}</code>`) : "";
   });
@@ -234,8 +291,13 @@ function mdInline(src: string): string {
   });
   s = s.replace(/`([^`]+)`/g, (_, code: string) => keep(`<code>${escape(code)}</code>`));
   s = s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
-  s = s.replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>").replace(/(?<!\w)_(.+?)_(?!\w)/g, "<em>$1</em>");
-  while (s.includes("\u0000")) s = s.replace(/\u0000(\d+)\u0000/g, (_, i: string) => slots[Number(i)]);
+  s = s
+    .replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>")
+    .replace(/(?<!\w)_(.+?)_(?!\w)/g, "<em>$1</em>");
+  while (s.includes("\u0000"))
+    // NUL marks the placeholders written by keep(): the regex must match it.
+    // oxlint-disable-next-line no-control-regex
+    s = s.replace(/\u0000(\d+)\u0000/g, (_, i: string) => slots[Number(i)]);
   return s.replace(/\s+/g, " ").trim();
 }
 
@@ -245,7 +307,9 @@ const ASSETS = /(?<=["'(\s,])\/shared-assets\//g;
 /** The page's interactive example, else the first example of its Examples section. */
 function mdnExample(body: string): Example | null {
   const fence = /^```(\w+)([^\n]*)\n([\s\S]*?)^```/gm;
-  let blocks = [...body.matchAll(fence)].filter((m) => m[2].includes("interactive-example")).map((m) => [m[1], m[3]]);
+  let blocks = [...body.matchAll(fence)]
+    .filter((m) => m[2].includes("interactive-example"))
+    .map((m) => [m[1], m[3]]);
   if (!blocks.length && body.includes("\n## Examples")) {
     const section = body.split("\n## Examples")[1].split("\n## ")[0];
     for (const chunk of section.split("\n### ")) {
@@ -259,21 +323,36 @@ function mdnExample(body: string): Example | null {
   const out: Partial<Record<"html" | "css" | "js", string>> = {};
   for (const [lang, code] of blocks) {
     if (lang !== "html" && lang !== "css" && lang !== "js") continue;
-    out[lang] = [out[lang], code.trim()].filter(Boolean).join("\n\n").replace(ASSETS, "https://developer.mozilla.org/shared-assets/");
+    out[lang] = [out[lang], code.trim()]
+      .filter(Boolean)
+      .join("\n\n")
+      .replace(ASSETS, "https://developer.mozilla.org/shared-assets/");
   }
   return out.html ? { html: out.html, css: out.css ?? null, js: out.js ?? null } : null;
 }
 
 async function readMdn(root: string, name: string) {
-  const rel = MDN_EXTRA[name] ?? `${MDN_ELEMENTS}/${/^h[1-6]$/.test(name) ? "heading_elements" : name}`;
+  const rel =
+    MDN_EXTRA[name] ?? `${MDN_ELEMENTS}/${/^h[1-6]$/.test(name) ? "heading_elements" : name}`;
   const file = Bun.file(join(root, rel, "index.md"));
   if (!(await file.exists())) return null;
   const [, front, ...rest] = (await file.text()).split("---");
   const body = rest.join("---");
   const slug = front.match(/^slug: (.+)$/m)![1].trim();
-  const compat = front.match(/^browser-compat:\s*(\S+)$/m)?.[1] ?? front.match(/^\s+- (\w+\.elements\.[\w-]+)$/m)?.[1] ?? null;
-  const paragraph = body.trim().split("\n\n").find((p) => p.trim() && !/^\s*(\{\{|#|>|```)/.test(p));
-  return { url: MDN + slug, summary: paragraph ? mdInline(paragraph) : "", compat, example: mdnExample(body) };
+  const compat =
+    front.match(/^browser-compat:\s*(\S+)$/m)?.[1] ??
+    front.match(/^\s+- (\w+\.elements\.[\w-]+)$/m)?.[1] ??
+    null;
+  const paragraph = body
+    .trim()
+    .split("\n\n")
+    .find((p) => p.trim() && !/^\s*(\{\{|#|>|```)/.test(p));
+  return {
+    url: MDN + slug,
+    summary: paragraph ? mdInline(paragraph) : "",
+    compat,
+    example: mdnExample(body),
+  };
 }
 
 // ------------------------------------------------------------------ BCD and web-features
@@ -291,7 +370,12 @@ function readCompat(bcd: unknown, key: string): Compat | null {
       standardTrack: at(c, ["status", "standard_track"]) !== false,
     },
     support: Object.fromEntries(BROWSERS.map((b) => [b, supportLabel(at(c, ["support", b]))])),
-    spec: typeof spec === "string" ? spec : Array.isArray(spec) && typeof spec[0] === "string" ? spec[0] : null,
+    spec:
+      typeof spec === "string"
+        ? spec
+        : Array.isArray(spec) && typeof spec[0] === "string"
+          ? spec[0]
+          : null,
   };
 }
 
@@ -300,7 +384,16 @@ function supportLabel(statement: unknown): string {
   const first: unknown = Array.isArray(statement) ? statement[0] : statement;
   if (!isRecord(first)) return "?";
   const added = first.version_added;
-  let label = added === true ? "Yes" : added === false ? "No" : added === "preview" ? "Preview" : typeof added === "string" ? added : "?";
+  let label =
+    added === true
+      ? "Yes"
+      : added === false
+        ? "No"
+        : added === "preview"
+          ? "Preview"
+          : typeof added === "string"
+            ? added
+            : "?";
   if (first.flags) label += " (flag)";
   if (typeof first.prefix === "string") label += ` (${first.prefix} prefix)`;
   if (typeof first.version_removed === "string") label += `, removed in ${first.version_removed}`;
@@ -321,7 +414,12 @@ function baselineIndex(features: unknown): Map<string, Baseline> {
     const date = (v: unknown) => (typeof v === "string" ? v : null);
     for (const key of Array.isArray(f.compat_features) ? f.compat_features : []) {
       if (typeof key !== "string") continue;
-      out.set(key, { feature: id, status: level, lowDate: date(status.baseline_low_date), highDate: date(status.baseline_high_date) });
+      out.set(key, {
+        feature: id,
+        status: level,
+        lowDate: date(status.baseline_low_date),
+        highDate: date(status.baseline_high_date),
+      });
     }
   }
   return out;
@@ -356,7 +454,10 @@ async function main() {
       return sections.get(key)!;
     };
 
-    const extraAnchor: Record<string, string> = { svg: "embedded-content-other.html#svg-0", math: "embedded-content-other.html#mathml" };
+    const extraAnchor: Record<string, string> = {
+      svg: "embedded-content-other.html#svg-0",
+      math: "embedded-content-other.html#mathml",
+    };
     for (const row of parseElements(indices, byHref)) {
       const anchor = extraAnchor[row.names[0]] ?? row.anchor;
       const entry = tocMap.get(anchor);
@@ -364,7 +465,12 @@ async function main() {
       const num = entry.num.split(".").slice(0, 2).join(".");
       const [href, top] = [...tocMap.entries()].find(([, t]) => t.num === num)!;
       const section = sectionFor(num, () => ({
-        slug: slugify(top.title), number: num, title: top.title, kind: "standard", spec: SPEC + href, elements: [],
+        slug: slugify(top.title),
+        number: num,
+        title: top.title,
+        kind: "standard",
+        spec: SPEC + href,
+        elements: [],
       }));
       const { anchor: _, ...rest } = row;
       const id = row.names.length > 1 ? `${row.names[0]}-${row.names.at(-1)}` : row.names[0];
@@ -376,8 +482,12 @@ async function main() {
     }
 
     const obsoleteSection = sectionFor("obsolete", () => ({
-      slug: "obsolete", number: "16.2", title: "Obsolete elements", kind: "obsolete",
-      spec: `${SPEC}obsolete.html#non-conforming-features`, elements: [],
+      slug: "obsolete",
+      number: "16.2",
+      title: "Obsolete elements",
+      kind: "obsolete",
+      spec: `${SPEC}obsolete.html#non-conforming-features`,
+      elements: [],
     }));
     for (const ob of parseObsolete(obsolete)) {
       if (seen.has(ob.name)) continue;
@@ -389,9 +499,16 @@ async function main() {
     }
 
     const proposals = sectionFor("proposals", () => ({
-      slug: "proposals", number: null, title: "Proposals and non-standard elements", kind: "proposals", spec: null, elements: [],
+      slug: "proposals",
+      number: null,
+      title: "Proposals and non-standard elements",
+      kind: "proposals",
+      spec: null,
+      elements: [],
     }));
-    const mdnNames = (await readdir(join(mdnRoot, MDN_ELEMENTS), { withFileTypes: true })).filter((d) => d.isDirectory()).map((d) => d.name);
+    const mdnNames = (await readdir(join(mdnRoot, MDN_ELEMENTS), { withFileTypes: true }))
+      .filter((d) => d.isDirectory())
+      .map((d) => d.name);
     const bcdElements = at(bcd.json, ["html", "elements"]);
     if (!isRecord(bcdElements)) throw new Error("browser-compat-data has no html.elements");
     const others = [...new Set([...Object.keys(bcdElements), ...mdnNames])]
@@ -416,7 +533,8 @@ async function main() {
     }
 
     const byNumber = (a: number[], b: number[]) => {
-      for (let i = 0; i < Math.max(a.length, b.length); i++) if ((a[i] ?? 0) !== (b[i] ?? 0)) return (a[i] ?? 0) - (b[i] ?? 0);
+      for (let i = 0; i < Math.max(a.length, b.length); i++)
+        if ((a[i] ?? 0) !== (b[i] ?? 0)) return (a[i] ?? 0) - (b[i] ?? 0);
       return 0;
     };
     for (const s of sections.values()) {
@@ -425,7 +543,10 @@ async function main() {
     }
     const sorted = [...sections.values()].sort((a, b) => {
       const rank = (s: Section) => (s.kind === "standard" ? 0 : s.kind === "obsolete" ? 1 : 2);
-      return rank(a) - rank(b) || byNumber((a.number ?? "0").split(".").map(Number), (b.number ?? "0").split(".").map(Number));
+      return (
+        rank(a) - rank(b) ||
+        byNumber((a.number ?? "0").split(".").map(Number), (b.number ?? "0").split(".").map(Number))
+      );
     });
 
     const data: Data = { sections: sorted, globalAttributes: globals };
@@ -451,9 +572,24 @@ async function main() {
 
 function emptyElement(name: string, spec: string | null): Element {
   return {
-    id: name, names: [name], spec, whatwg: "", categories: "", categoryList: [], parents: "", children: "",
-    attributes: [], globals: false, attrsNote: null, interface: "", advice: null,
-    mdn: null, status: { deprecated: false, experimental: false, standardTrack: true }, support: null, baseline: null, example: null,
+    id: name,
+    names: [name],
+    spec,
+    whatwg: "",
+    categories: "",
+    categoryList: [],
+    parents: "",
+    children: "",
+    attributes: [],
+    globals: false,
+    attrsNote: null,
+    interface: "",
+    advice: null,
+    mdn: null,
+    status: { deprecated: false, experimental: false, standardTrack: true },
+    support: null,
+    baseline: null,
+    example: null,
   };
 }
 

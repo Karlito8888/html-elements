@@ -2,17 +2,22 @@
 
 Static site at `https://html.charmaweb.com`: every HTML element with a live editable
 example, its attributes, content model, browser support and Baseline status. Astro 7,
-TypeScript, Bun, hand-written CSS. Remote `Karlito8888/html-elements`, branch `main`.
+TypeScript, Vite+ (`vp`, Bun underneath), hand-written CSS. Remote `Karlito8888/html-elements`, branch `main`.
 
 ## Commands
 
 ```bash
-bun run sync     # download the sources, rewrite data/elements.json and data/sources.json
-bun run validate # send every showcase to the W3C Nu HTML Checker (network; run by hand, not in CI)
-bun run dev      # http://localhost:4340
-bun run check    # the gate: astro check && astro build
-bun run preview  # serve dist/ on 4340 (daemonized: `bunx astro preview stop`)
+vp run sync     # download the sources, rewrite data/elements.json and data/sources.json
+vp run validate # send every showcase to the W3C Nu HTML Checker (network; run by hand, not in CI)
+vp run dev      # http://localhost:4340
+vp run gate     # the gate: astro check && vp check && astro build
+vp run preview  # serve dist/ on 4340 (daemonized: `vpx astro preview stop`)
 ```
+
+`vp check` formats with Oxfmt and lints and type-checks with Oxlint, configured in `vite.config.ts`
+(`src/showcases/`, `data/` and `wrangler.jsonc` are left unformatted); `.astro` files are covered
+by `astro check` only. `scripts/*.ts` use Bun APIs, so they run with `bun` through the `sync` and
+`validate` scripts. Hooks live in `.vite-hooks/` (`vp staged` on commit).
 
 ## Data
 
@@ -51,7 +56,7 @@ Each standard section page opens with a hand-written demo page that uses every e
 the section: `src/showcases/<slug>.html`, plus optional `.css` and `.js` (4.1 and 4.2 are
 full documents and keep their CSS inside). `src/showcases.ts` loads them and fails the
 build when a standard section has no showcase or a showcase skips one of its elements;
-`src/showcase-document.ts` builds the complete document that `bun run validate` checks.
+`src/showcase-document.ts` builds the complete document that `vp run validate` checks.
 Obsolete and proposals have none, by choice.
 
 `Example.astro` with the `showcase` prop draws a browser-window bar (the tab shows the

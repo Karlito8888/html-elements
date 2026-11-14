@@ -8,7 +8,8 @@ type Lang = "html" | "css" | "js";
 type Source = Record<Lang, string | null>;
 type Xray = { tags: string[]; urls: Record<string, string> };
 
-const SANDBOX = "allow-scripts allow-forms allow-modals allow-popups allow-popups-to-escape-sandbox";
+const SANDBOX =
+  "allow-scripts allow-forms allow-modals allow-popups allow-popups-to-escape-sandbox";
 // Neutral page defaults so examples render the same in light and dark mode; the example CSS follows and wins.
 const BASE_CSS = "body{margin:16px;font-family:system-ui,sans-serif;color:#1b1b1b;background:#fff}";
 
@@ -50,7 +51,13 @@ function xrayAgent(id: string, tags: string[], initiallyOn: boolean) {
     }
     const r = el.getBoundingClientRect();
     box.className = `${sectionTags.has(el.localName) ? "" : "other"} ${r.top < 22 ? "below" : ""}`;
-    Object.assign(box.style, { display: "block", left: `${r.left}px`, top: `${r.top}px`, width: `${r.width}px`, height: `${r.height}px` });
+    Object.assign(box.style, {
+      display: "block",
+      left: `${r.left}px`,
+      top: `${r.top}px`,
+      width: `${r.width}px`,
+      height: `${r.height}px`,
+    });
     label.textContent = `<${el.localName}>`;
   };
 
@@ -85,14 +92,16 @@ function xrayAgent(id: string, tags: string[], initiallyOn: boolean) {
       if (!on) show(null);
     }
     if ("highlight" in data) {
-      for (const el of document.querySelectorAll("[data-xray-match]")) el.removeAttribute("data-xray-match");
+      for (const el of document.querySelectorAll("[data-xray-match]"))
+        el.removeAttribute("data-xray-match");
       if (typeof data.highlight !== "string") return;
       const matches = [...document.getElementsByTagName(data.highlight)];
       for (const el of matches) el.setAttribute("data-xray-match", "");
       const first = matches.find((el) => el.getClientRects().length > 0);
       const r = first?.getBoundingClientRect();
       // Scroll the preview itself only, never the page around it.
-      if (r && (r.top < 0 || r.bottom > innerHeight)) scrollBy({ top: r.top - 40, behavior: "smooth" });
+      if (r && (r.top < 0 || r.bottom > innerHeight))
+        scrollBy({ top: r.top - 40, behavior: "smooth" });
     }
   };
   parent.postMessage({ example: id, port: true }, "*", [channel.port2]);
@@ -101,7 +110,9 @@ function xrayAgent(id: string, tags: string[], initiallyOn: boolean) {
     post({
       title: document.title,
       icon: document.querySelector<HTMLLinkElement>('link[rel~="icon"]')?.href ?? null,
-      hidden: tags.filter((t) => ![...document.getElementsByTagName(t)].some((el) => el.getClientRects().length > 0)),
+      hidden: tags.filter(
+        (t) => ![...document.getElementsByTagName(t)].some((el) => el.getClientRects().length > 0),
+      ),
     });
   report();
   addEventListener("load", report);
@@ -111,25 +122,34 @@ function srcdoc(source: Source, id: string, xray: (Xray & { on: boolean }) | nul
   const html = source.html ?? "";
   const fullDocument = /<html[\s>]|<!doctype/i.test(html);
   // The preview reports its height tagged with its element id so the page can size the frame.
-  const resize = `<script>new ResizeObserver(() => parent.postMessage({ previewHeight: Math.ceil(document.documentElement.getBoundingClientRect().height), example: ${JSON.stringify(id)} }, "*")).observe(document.documentElement);<\/script>`;
-  const agent = xray ? `<script>(${xrayAgent.toString()})(${JSON.stringify(id)}, ${JSON.stringify(xray.tags)}, ${xray.on});<\/script>` : "";
+  const resize = `<script>new ResizeObserver(() => parent.postMessage({ previewHeight: Math.ceil(document.documentElement.getBoundingClientRect().height), example: ${JSON.stringify(id)} }, "*")).observe(document.documentElement);</script>`;
+  const agent = xray
+    ? `<script>(${xrayAgent.toString()})(${JSON.stringify(id)}, ${JSON.stringify(xray.tags)}, ${xray.on});</script>`
+    : "";
   return (
     (fullDocument ? "" : `<!doctype html><meta charset="utf-8"><style>${BASE_CSS}</style>`) +
     (source.css ? `<style>${source.css}</style>` : "") +
     html +
-    (source.js ? `<script>${source.js}<\/script>` : "") +
+    (source.js ? `<script>${source.js}</script>` : "") +
     resize +
     agent
   );
 }
 
 function combined(source: Source): string {
-  return [source.html, source.css && `<style>\n${source.css}\n</style>`, source.js && `<script>\n${source.js}\n<\/script>`]
+  return [
+    source.html,
+    source.css && `<style>\n${source.css}\n</style>`,
+    source.js && `<script>\n${source.js}\n</script>`,
+  ]
     .filter(Boolean)
     .join("\n\n");
 }
 
-const handlers = new Map<string, (data: Record<string, unknown>, ports: readonly MessagePort[]) => void>();
+const handlers = new Map<
+  string,
+  (data: Record<string, unknown>, ports: readonly MessagePort[]) => void
+>();
 
 function setup(root: HTMLElement) {
   const id = root.dataset.example!;
@@ -184,7 +204,8 @@ function setup(root: HTMLElement) {
       frame.style.height = `${Math.min(Math.max(data.previewHeight, 140), maxHeight)}px`;
     }
     if (!xray) return;
-    if (typeof data.title === "string" && tabTitle) tabTitle.textContent = data.title || tabTitle.dataset.fallback!;
+    if (typeof data.title === "string" && tabTitle)
+      tabTitle.textContent = data.title || tabTitle.dataset.fallback!;
     if ("icon" in data && tabIcon) {
       tabIcon.hidden = typeof data.icon !== "string";
       if (typeof data.icon === "string") tabIcon.src = data.icon;
@@ -199,7 +220,8 @@ function setup(root: HTMLElement) {
       const note = root.querySelector<HTMLElement>("[data-offscreen-note]");
       if (note) note.hidden = !chips.some((chip) => chip.classList.contains("offscreen"));
     }
-    if (typeof data.navigate === "string" && xray.urls[data.navigate]) location.href = xray.urls[data.navigate];
+    if (typeof data.navigate === "string" && xray.urls[data.navigate])
+      location.href = xray.urls[data.navigate];
   });
 
   const xrayButton = root.querySelector<HTMLButtonElement>('[data-action="xray"]');
@@ -279,6 +301,12 @@ for (const root of document.querySelectorAll<HTMLElement>("[data-example]")) set
 // Every preview posts messages tagged with its example id; route them to that example.
 window.addEventListener("message", (e) => {
   const data: unknown = e.data;
-  if (typeof data !== "object" || data === null || !("example" in data) || typeof data.example !== "string") return;
+  if (
+    typeof data !== "object" ||
+    data === null ||
+    !("example" in data) ||
+    typeof data.example !== "string"
+  )
+    return;
   handlers.get(data.example)?.(data as Record<string, unknown>, e.ports);
 });
