@@ -3,6 +3,7 @@
 Static site at `https://html.charmaweb.com`: every HTML element with a live editable
 example, its attributes, content model, browser support and Baseline status. Astro 7,
 TypeScript, Vite+ (`vp`, Bun underneath), hand-written CSS. Remote `Karlito8888/html-elements`, branch `main`.
+Project card (identity and structural decisions only): `~/.omp/agent/bank/html-elements.md`.
 
 ## Commands
 
