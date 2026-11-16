@@ -5549,6 +5549,12 @@
        "href": "https://html.spec.whatwg.org/multipage/input.html#attr-input-step"
       },
       {
+       "name": "switch",
+       "desc": "Whether the control is a switch",
+       "value": "<a href=\"https://html.spec.whatwg.org/multipage/common-microsyntaxes.html#boolean-attribute\">Boolean attribute</a>",
+       "href": "https://html.spec.whatwg.org/multipage/input.html#attr-input-switch"
+      },
+      {
        "name": "type",
        "desc": "Type of form control",
        "value": "<a href=\"https://html.spec.whatwg.org/multipage/input.html#attr-input-type\"><code>input</code> type keyword</a>",
