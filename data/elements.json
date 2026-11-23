@@ -5549,6 +5549,12 @@
        "href": "https://html.spec.whatwg.org/multipage/input.html#attr-input-step"
       },
       {
+       "name": "switch",
+       "desc": "Whether the control is a switch",
+       "value": "<a href=\"https://html.spec.whatwg.org/multipage/common-microsyntaxes.html#boolean-attribute\">Boolean attribute</a>",
+       "href": "https://html.spec.whatwg.org/multipage/input.html#attr-input-switch"
+      },
+      {
        "name": "type",
        "desc": "Type of form control",
        "value": "<a href=\"https://html.spec.whatwg.org/multipage/input.html#attr-input-type\"><code>input</code> type keyword</a>",
@@ -8117,11 +8123,11 @@
       "standardTrack": true
      },
      "support": {
-      "chrome": "126",
-      "edge": "126",
+      "chrome": "156",
+      "edge": "156",
       "firefox": "No",
       "safari": "No",
-      "chrome_android": "126",
+      "chrome_android": "156",
       "safari_ios": "No"
      },
      "baseline": null,
